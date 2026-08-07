@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 
 const authRoutes = require("./routes/auth.routes");
 const aiRoutes = require("./routes/ai.routes");
@@ -7,14 +8,17 @@ const messageRoutes = require("./routes/message.routes");
 const documentRoutes = require("./routes/document.routes");
 const ragRoutes = require("./routes/rag.routes");
 
-console.log("authRoutes:", typeof authRoutes);
-console.log("aiRoutes:", typeof aiRoutes);
-console.log("conversationRoutes:", typeof conversationRoutes);
-console.log("messageRoutes:", typeof messageRoutes);
-console.log("documentRoutes:", typeof documentRoutes);
-console.log("ragRoutes:", typeof ragRoutes);
-
 const app = express();
+
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://YOUR-VERCEL-APP.vercel.app",
+    ],
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
