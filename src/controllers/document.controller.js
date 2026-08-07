@@ -38,7 +38,7 @@ const uploadDocument = async (req, res) => {
         }
 
         // Extract PDF text
-        const text = await extractTextFromPDF(req.file.path);
+        const text = await extractTextFromPDF(req.file.buffer);
 
         console.log("Text Length:", text.length);
         console.log("Extracted Text:");
@@ -100,6 +100,11 @@ const uploadDocument = async (req, res) => {
                 message: "No vectors generated.",
             });
         }
+        console.log("====================");
+console.log("TEXT LENGTH:", text.length);
+console.log("CHUNKS:", chunks.length);
+console.log("VECTORS:", vectors.length);
+console.log("====================");
 
         await storeEmbeddings(vectors);
 
