@@ -14,7 +14,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://ai-pdf-chatbot-rag-gamma.vercel.app",
+      "https://ai-pdf-chatbot-ke26a2ozf-krishnatiwari705s-projects.vercel.app",
     ],
     credentials: true,
   })
