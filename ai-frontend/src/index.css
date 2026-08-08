@@ -1,12 +1,64 @@
 @import "tailwindcss";
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+@keyframes loginGlow {
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: translate(80px, 40px) scale(1.15);
+        opacity: 0.8;
+    }
 }
 
-body{
-    background:#111827;
-    font-family: Inter, sans-serif;
+@keyframes loginGlowReverse {
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.4;
+    }
+
+    50% {
+        transform: translate(-70px, -50px) scale(1.12);
+        opacity: 0.7;
+    }
+}
+
+@keyframes loginParticle {
+    0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 0.7;
+    }
+
+    50% {
+        transform: translateY(-50px) translateX(25px);
+        opacity: 1;
+    }
+
+    80% {
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: translateY(-100px) translateX(-20px);
+        opacity: 0;
+    }
+}
+
+.animate-login-glow {
+    animation: loginGlow 9s ease-in-out infinite;
+}
+
+.animate-login-glow-reverse {
+    animation: loginGlowReverse 11s ease-in-out infinite;
+}
+
+.animate-login-particle {
+    animation: loginParticle 7s ease-in-out infinite;
 }
