@@ -1,10 +1,17 @@
 const express = require("express");
+
 const router = express.Router();
 
 const auth = require("../middleware/auth.middleware");
 
-const { askDocument } = require("../controllers/rag.controller");
+const {
+    askQuestion,
+} = require("../controllers/rag.controller");
 
-router.post("/ask", auth, askDocument);
+router.post(
+    "/ask",
+    auth,
+    askQuestion
+);
 
 module.exports = router;

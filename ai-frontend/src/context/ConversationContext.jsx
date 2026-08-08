@@ -1,70 +1,131 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import {
+    createContext,
+    useContext,
+    useState,
+    useEffect,
+} from "react";
+
 import api from "../api/axios";
 
 const ConversationContext = createContext();
 
-export const ConversationProvider = ({ children }) => {
-  const [conversations, setConversations] = useState([]);
-  const [selectedConversation, setSelectedConversation] = useState(null);
-  const [loading, setLoading] = useState(false);
+export const ConversationProvider = ({
+    children,
+}) => {
+    const [conversations, setConversations] =
+        useState([]);
 
-  const fetchConversations = async () => {
-    try {
-      setLoading(true);
+    const [selectedConversation, setSelectedConversation] =
+        useState(null);
 
-      const { data } = await api.get("/conversations");
+    const [loading, setLoading] =
+        useState(false);
 
-      setConversations(data.conversations);
+    const fetchConversations = async () => {
+        try {
+            setLoading(true);
 
-      if (data.conversations.length > 0) {
-        setSelectedConversation(data.conversations[0]);
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+            const { data } = await api.get(
+                "/conversations"
+            );
 
-  const createConversation = async () => {
-    try {
-      const { data } = await api.post("/conversations", {
-        title: "New Chat",
-      });
+            const fetchedConversations =
+                data.conversations || [];
 
-      setConversations((prev) => [
-        data.conversation,
-        ...prev,
-      ]);
+            setConversations(
+                fetchedConversations
+            );
 
-      setSelectedConversation(data.conversation);
+            /*
+             * Only select the first conversation
+             * when nothing is currently selected.
+             */
+            setSelectedConversation(
+                (currentSelected) => {
+                    if (currentSelected) {
+                        const updatedSelected =
+                            fetchedConversations.find(
+                                (conversation) =>
+                                    conversation._id ===
+                                    currentSelected._id
+                            );
 
-      return data.conversation;
-    } catch (error) {
-      console.log(error);
-    }
-  };
+                        return (
+                            updatedSelected ||
+                            currentSelected
+                        );
+                    }
 
-  useEffect(() => {
-    fetchConversations();
-  }, []);
+                    return (
+                        fetchedConversations[0] ||
+                        null
+                    );
+                }
+            );
 
-  return (
-    <ConversationContext.Provider
-      value={{
-        conversations,
-        selectedConversation,
-        setSelectedConversation,
-        createConversation,
-        fetchConversations,
-        loading,
-      }}
-    >
-      {children}
-    </ConversationContext.Provider>
-  );
+        } catch (error) {
+            console.error(
+                "Fetch conversations error:",
+                error.response?.data ||
+                    error.message
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const createConversation = async () => {
+        try {
+            const { data } =
+                await api.post(
+                    "/conversations",
+                    {
+                        title: "New Chat",
+                    }
+                );
+
+            setConversations((previous) => [
+                data.conversation,
+                ...previous,
+            ]);
+
+            setSelectedConversation(
+                data.conversation
+            );
+
+            return data.conversation;
+
+        } catch (error) {
+            console.error(
+                "Create conversation error:",
+                error.response?.data ||
+                    error.message
+            );
+        }
+    };
+
+    useEffect(() => {
+        fetchConversations();
+    }, []);
+
+    return (
+        <ConversationContext.Provider
+            value={{
+                conversations,
+                selectedConversation,
+                setSelectedConversation,
+                createConversation,
+                fetchConversations,
+                loading,
+            }}
+        >
+            {children}
+        </ConversationContext.Provider>
+    );
 };
 
 export const useConversation = () => {
-  return useContext(ConversationContext);
+    return useContext(
+        ConversationContext
+    );
 };
