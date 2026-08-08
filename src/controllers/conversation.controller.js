@@ -1,6 +1,5 @@
-
 const Conversation = require("../models/Conversation");
-
+const Message = require("../models/Message");
 
 // Create Conversation
 const createConversation = async (req, res) => {
@@ -16,7 +15,6 @@ const createConversation = async (req, res) => {
             success: true,
             conversation,
         });
-
     } catch (error) {
         return res.status(500).json({
             success: false,
@@ -36,7 +34,6 @@ const getConversations = async (req, res) => {
             success: true,
             conversations,
         });
-
     } catch (error) {
         return res.status(500).json({
             success: false,
@@ -64,7 +61,6 @@ const getConversationById = async (req, res) => {
             success: true,
             conversation,
         });
-
     } catch (error) {
         return res.status(500).json({
             success: false,
@@ -76,7 +72,7 @@ const getConversationById = async (req, res) => {
 // Delete Conversation
 const deleteConversation = async (req, res) => {
     try {
-        const conversation = await Conversation.findOneAndDelete({
+        const conversation = await Conversation.findOne({
             _id: req.params.id,
             user: req.user.id,
         });
@@ -88,12 +84,24 @@ const deleteConversation = async (req, res) => {
             });
         }
 
-        return res.status(200).json({
-            success: true,
-            message: "Conversation deleted successfully",
+        // Delete all messages belonging to this conversation
+        await Message.deleteMany({
+            conversation: req.params.id,
         });
 
+        // Delete the conversation itself
+        await Conversation.deleteOne({
+            _id: req.params.id,
+            user: req.user.id,
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Conversation and messages deleted successfully",
+        });
     } catch (error) {
+        console.error("Delete conversation error:", error);
+
         return res.status(500).json({
             success: false,
             message: error.message,

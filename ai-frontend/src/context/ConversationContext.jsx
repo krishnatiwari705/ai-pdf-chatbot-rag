@@ -9,9 +9,7 @@ import api from "../api/axios";
 
 const ConversationContext = createContext();
 
-export const ConversationProvider = ({
-    children,
-}) => {
+export const ConversationProvider = ({ children }) => {
     const [conversations, setConversations] =
         useState([]);
 
@@ -32,14 +30,8 @@ export const ConversationProvider = ({
             const fetchedConversations =
                 data.conversations || [];
 
-            setConversations(
-                fetchedConversations
-            );
+            setConversations(fetchedConversations);
 
-            /*
-             * Only select the first conversation
-             * when nothing is currently selected.
-             */
             setSelectedConversation(
                 (currentSelected) => {
                     if (currentSelected) {
@@ -62,7 +54,6 @@ export const ConversationProvider = ({
                     );
                 }
             );
-
         } catch (error) {
             console.error(
                 "Fetch conversations error:",
@@ -94,13 +85,61 @@ export const ConversationProvider = ({
             );
 
             return data.conversation;
-
         } catch (error) {
             console.error(
                 "Create conversation error:",
                 error.response?.data ||
                     error.message
             );
+        }
+    };
+
+    // Delete conversation
+    const deleteConversation = async (conversationId) => {
+        try {
+            await api.delete(
+                `/conversations/${conversationId}`
+            );
+
+            // Remove deleted conversation from UI
+            setConversations((previous) =>
+                previous.filter(
+                    (conversation) =>
+                        conversation._id !==
+                        conversationId
+                )
+            );
+
+            // If deleted conversation was selected,
+            // select another conversation
+            setSelectedConversation(
+                (currentSelected) => {
+                    if (
+                        currentSelected?._id !==
+                        conversationId
+                    ) {
+                        return currentSelected;
+                    }
+
+                    const remaining =
+                        conversations.filter(
+                            (conversation) =>
+                                conversation._id !==
+                                conversationId
+                        );
+
+                    return remaining[0] || null;
+                }
+            );
+
+        } catch (error) {
+            console.error(
+                "Delete conversation error:",
+                error.response?.data ||
+                    error.message
+            );
+
+            throw error;
         }
     };
 
@@ -115,6 +154,7 @@ export const ConversationProvider = ({
                 selectedConversation,
                 setSelectedConversation,
                 createConversation,
+                deleteConversation,
                 fetchConversations,
                 loading,
             }}
