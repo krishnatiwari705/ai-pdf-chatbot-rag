@@ -53,13 +53,19 @@ const uploadDocument = async (req, res) => {
 
         // Save document
         const document = await Document.create({
-            user: req.user.id,
-            conversation: conversationId,
-            fileName: req.file.filename,
-            originalName: req.file.originalname,
-            fileUrl: req.file.path,
-            text,
-        });
+    user: req.user.id,
+    conversation: conversationId,
+
+    // Use original filename since memoryStorage has no filename
+    fileName: req.file.originalname,
+
+    originalName: req.file.originalname,
+
+    // No local file path with memoryStorage
+    fileUrl: "",
+
+    text,
+});
 
         // Split text
         const splitter = new RecursiveCharacterTextSplitter({
